@@ -3,8 +3,7 @@ title: "WorldHappiness_Report_2021"
 author: "Ayman Tuffaha"
 date: "9/4/2021"
 output:
-  html_document:
-    df_print: paged
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -82,39 +81,22 @@ ggplot(data = data, aes(x = score, Logged.GDP.per.capita)) +
   geom_point(color='black') +
   geom_smooth(method = "lm", se = TRUE)
 ```
-Let's compare `Score` versus poopulation `pop2021` and `Score` versus `GDP per capita`:
+Let's compare `Score` versus population `pop2021`:
 
 ```{r score_vs_population, echo=FALSE}
-ggplot(data = data, aes(x = score, pop2021)) + 
+  ggplot(data = data, aes(x = score, pop2021)) + 
   geom_point(color='black') +
   geom_smooth(method = "lm", se = TRUE)
 ```
 
-```{r score_vs_gdp, echo=FALSE}
-ggplot(data = data, aes(x = score, Logged.GDP.per.capita)) + 
-  geom_point(color='black') +
-  geom_smooth(method = "lm", se = TRUE)
-```
-
-Let's compare `Score` versus `Perceptions.of.corruption` and `Score` versus `GDP per capita`:
+Let's compare `Score` versus `Perceptions.of.corruption`:
 
 ```{r score_vs_perceptions of corruption, echo=FALSE}
 ggplot(data = data, aes(x = score, Perceptions.of.corruption)) + 
   geom_point(color='black') +
   geom_smooth(method = "lm", se = TRUE)
 ```
-
-```{r score_vs_gdp, echo=FALSE}
-ggplot(data = data, aes(x = score, Logged.GDP.per.capita)) + 
-  geom_point(color='black') +
-  geom_smooth(method = "lm", se = TRUE)
-```
-A horizontal line of best fit shows the lack of correlation between score and generosity, population, and Perceptions of corruption.
-
-Note that the correlation between score and generosity on the correlation map was close to zero. Conversely, the plot of Score and GDP per capita clearly shows a positive correlation between the two: When `GDP per capita` increases, `Score` also increases. Also note the line of best fit for generosity has relatively high confidence bands compared to the GDP per capita plot, realizing it is a rather unstable parameter.
-
-Visualizing data patterns may offer clues of intriguing routes to choose when performing analysis but it doesn't provide any noteworthy prediction capabilities. This is where machine learning techniques begin to excel. In the next section, we build several models to determine the best way to predict a happiness score.
-
+In the next section, we build several models to determine the best way to predict a happiness score.
 
 
 ## Methods
@@ -144,8 +126,6 @@ sum_model %>%
 # save RMSE for the first model
 mod1_rmse <- RMSE(sum_model$score, sum_model$pred_score)
 ```
-
-All predicted scores shows the same RMSE! In addition to the dystopian standard score, previous Happiness Report data sets also have a "dystopian residual" that contributes to the happiness score. Since the residual is not shown or described in this data set, it is deemed inappropriate to introduce it ourselved into the model. Although, without this value, the data set does seem incomplete. In spite of its absence, the dystopian residual column is calculated and a snippet of these are shown below. This is calculated under the assumption the summation model is perfect. Simply subtracting all factors and the standard dystopia value from the happiness score will yield the residual. There is no mention of the missing residual in any recent discussions to the 2018 or 2019 dataset, therefore it is omitted in subsequent modeling techniques. We can conclude that the sum of factors model is not perfectly accurate as portrayed in the discussion boards; it has a RMSE of 0.5280065.
 
 ```{r }
 # calculate the missing dystopian residuals
@@ -381,46 +361,12 @@ rmse_list[] <- lapply(rmse_list, round, 3)
 | Method                              | RMSE              |
 |-------------------------------------|-------------------|
 | Sum of Factors Model                | `r rmse_list[1]`  |
-| GLM Model 2019                      | `r rmse_list[2]`  |
-| GLM Model 2018/2019                 | `r rmse_list[4]`  |
-| GLM Model - No Generosity 2019      | `r rmse_list[3]`  |
-| GLM Model - No Generosity 2018/2019 | `r rmse_list[5]`  |
-
-For completeness, it may be useful to check the summation model with the full 2018-2019 data set. This is shown below and reported in the final table.
-
-
-```{r sum_factors_model_full, echo=TRUE, warning=FALSE}
-# save RMSE for the first model
-mod1_rmse_full <- RMSE(sum_model$Score, sum_model$pred_score)
-```
-```{r mod1_full_rmse_save, include=FALSE}
-# recompiles the list of RMSEs
-rmse_list <- list(mod1_rmse,
-                  mod2_rmse_gen_pop_corruption,
-                  mod2_rmse_nogen,
-                  mod2_rmse_nopop,
-                  mod2_rmse_nocorruption,
-                  mod1_rmse_full)
-
-rmse_list[] <- lapply(rmse_list, round, 3)
-```
-
-It is clearly seen that the best model is the summation model. Interestingly the GLM models do not improve when the data set size doubles. This may be due to overfitting in smaller data size that does not occur in the larger data.
-
-| Method                              | RMSE              |
-|-------------------------------------|-------------------|
-| Sum of Factors Model                | `r rmse_list[1]`  |
-| Sum of Factors Model 2018/2019      | `r rmse_list[6]`  |
-| GLM Model 2019                      | `r rmse_list[2]`  |
-| GLM Model 2018/2019                 | `r rmse_list[4]`  |
-| GLM Model - No Generosity 2019      | `r rmse_list[3]`  |
-| GLM Model - No Generosity 2018/2019 | `r rmse_list[5]`  |
-
+| Model 2 RMSE with all factors       | `r rmse_list[2]`  |
+| GLM Model - No Generosity 2021      | `r rmse_list[3]`  |
+| GLM Model - No Population 2021      | `r rmse_list[4]`  |
+| GLM Model - No corruption 2021      | `r rmse_list[5]`  |
 
 
 ## Conclusion
-
-Machine learning algorithms have become a paramount tool in computer science and analysis. This report explores this use with regression analysis on a dataset of national happiness. Results are found that are rather unexpected: a glaring error in the data did not impede the simplest model, increasing training data set size did not decrease the error, and reducing the effectiveness of uncorrelated variables did not decrease the error.
-
-This report felt limited in the amount of data being trained and tested. If more consistent data was available, it is my belief that the summation model would out perform the GLM models. The omitted residuals left a hole in the data that may have provided more insight into the validity of the summation model. The discussion boards were helpful in this respect by providing insight on the purpose of the data. Further work on a project such as this would include calculating and using dystopian residuals for data sets where they were lost, combining previous years reports, and comparing more adaptive models on the large data sets.
+This report felt limited in the amount of data being trained and tested. If more consistent data was available, it is my belief that the summation model would out perform the GLM models. The other thing to consider at this report is different component factors like population of the country or generosity or perceptions of corruption may slightly affects the happiness score as indicated at the above RMSE values based on 3 taken factors: Generosty, number of population, and perseptions of corruption.
 

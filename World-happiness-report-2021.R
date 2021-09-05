@@ -196,6 +196,3 @@ ggplot(data = results, aes(Score, pred_score)) +
 # ----- using rmse instead of cor: https://www.r-bloggers.com/dont-use-correlation-to-track-prediction-performance/
 # print residual sum of squares
 RMSE(results$Score, results$pred_score)
-
-# print coefficients of fitted model
-fit_full_2$coefficients
