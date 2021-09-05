@@ -121,14 +121,14 @@ rmses <- sapply(ps, function(p){
                Freedom.to.make.life.choices + 
                Generosity + 
                Perceptions.of.corruption, 
-             data12 = train)
+             data = train)
   test <- test %>% 
     mutate(pred_score = predict.glm(fit, newdata=test))
-  RMSE(test$score, test$pred_score)
+    RMSE(test$score, test$pred_score)
 })
 rmses
 # no real clear winner in terms of best accuracy in probabilities
-plot(ps, rmses_1)
+plot(ps, rmses)
 ps[which.min(rmses)]
 min(rmses)
 
@@ -151,7 +151,7 @@ fit <- glm(score ~ pop2021 +
              Freedom.to.make.life.choices + 
              Generosity + 
              Perceptions.of.corruption, 
-             data1 = train)
+           data = train)
 
 # add predicted scores to our 'data' data frame
 results <- test %>% 
